@@ -1,0 +1,241 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    background-color: #000;
+    color: #555;
+    font-family: 'Lato', 'Arial', sans-serif;
+    font-size: 20px;
+    font-weight: 300;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+}
+
+section {
+    background-color: #fff;
+}
+
+.clearfix {zoom:1}
+.clearfix:after {
+    content: '.';
+    clear: both;
+    display: block;
+    height: 0;
+    visibility: hidden;
+}
+
+/* tags */
+header {
+    background-image: linear-gradient(rgba(0,0,0, 0.75), rgba(0,0,0, 0.75)), url(../img/headerbg.jpeg);
+    background-size: cover;
+    background-position: bottom;
+    background-attachment: fixed;
+    height: 20vh;
+}
+
+footer {
+    background-image: linear-gradient(rgba(0,0,0, 0.75), rgba(0,0,0, 0.75)), url(../img/footerbg.jpg);
+    background-size: cover;
+    background-position: bottom;
+    background-attachment: unset;
+    text-align: center;    
+    color: #ffffff;
+    padding-top: 30px;
+    padding-bottom: 20px;
+    font-size: 80%;
+}
+
+h1 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #ffffff;
+    font-size: 340%;
+    word-spacing: 4px;    
+    text-transform: uppercase;
+}
+
+textarea {
+    height: 100px;
+    width: 90%;
+    display: inline-block;
+    vertical-align: top;
+    resize: vertical;
+}
+
+input[type=text] {
+    width: 90%;
+}
+
+select {
+    width: 90%;
+}
+
+/* style */
+.hero-text-box {
+    position: absolute;
+    width: 100%;
+    top: 10%;
+    left: 90%;
+    transform: translate(-50%, -50%);
+    color: #d3d3d3;
+    text-transform: uppercase;
+}
+
+.section__registry {
+    /* text-align: center; */
+    align-items: center;
+}
+
+.section__registry--breadcrumb,
+.section__registry--level-nav {
+    padding: 10px;
+    font-size: 80%;
+} 
+
+.section__registry--breadcrumb {
+    float: left;
+    padding-left: 20px;
+}
+
+.section__registry--level-nav {
+    float: right;
+}
+
+.section__registry--list,
+.section__registry--single {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    /* text-align: center; */
+    text-align: center;
+}
+
+.section__registry--single--title {
+    padding: 10px;
+    padding-bottom: 20px;
+}
+
+.section__registry--single--accountable {
+    text-align: left;
+    
+}
+
+.section__registry--single--text {
+    text-align: justify;
+    padding-bottom: 20px;
+    padding-top: 10px;
+}
+
+.section__registry--single--actions {
+    padding: 10px 0px;
+}
+
+.section__registry--list {
+    text-decoration-color: #3f2c21;
+}
+
+.section__registry--list li {
+    list-style:none;
+    line-height: 130%;
+}
+
+.section__registry--list li::before {
+    content: "\2022";
+    color: #3f2c21;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-right: 30px;
+    
+}
+.section__registry--single--add {
+    padding-left: 25%;
+    padding-right: 25%;
+    text-align: right;
+}
+
+.section__registry--single--form-line {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.section__registry--single--form-line-top {
+    margin-bottom: 10px;
+}
+
+/*.section__registry--single--form-text-area 
+/* icons */
+
+.icon-small, 
+.icon-small-health-check-ok, 
+.icon-small-health-check-fail, 
+.icon-small-level-nav-hidden,
+.icon-small-level-nav {
+    color: #000;
+    display: inline-block;
+    width: 40px;
+    text-align: center;
+    font-size: 180%;
+    line-height: 120%;
+    vertical-align: middle;
+    margin-top: -5px;
+    margin-right: 0px;
+}
+
+.icon-small-level-nav-hidden {
+    opacity: 0%;
+}
+
+.icon-small-level-nav {
+    font-size: 400%;
+}
+
+.icon-small-health-check-ok {    
+    color: #2f2;
+    font-size: 120%;
+    vertical-align: middle;
+}
+
+.icon-small-health-check-fail {
+    color: #f22;
+    font-size: 120%;
+    vertical-align: middle;
+}
+
+.section__registry--accountables {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* buttons */
+.button:link,
+.button:visited,
+input[type=submit] {
+    display: inline-block;
+    padding: 10px 30px;
+    font-weight: 300;
+    text-decoration: none;
+    color: #ffffff;
+    border-radius: 200px;
+    transition: background-color 0.2s, border 0.2s, color 0.2s;
+    border: 1px solid #3b210a;
+    background-color: #3b210a;
+    margin-right: 15px;
+    font-size: 70%;
+}
+
+.button:hover, 
+.button:active,
+input[type=submit]:hover, input[type=submit]:active {
+    background-color: #5f3917;
+    border: 1px solid #5f3917;
+}
+
+.hr-soft {
+    width: 2%;
+    margin-bottom: 10px;
+}

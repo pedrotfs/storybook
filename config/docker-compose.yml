@@ -1,0 +1,31 @@
+version: '3'
+services:
+    db:
+        image: 'mongo:4.0.4'
+        container_name: 'mongodb-server'
+        volumes:
+            - ./mongo/volume_404:/data/db
+        ports:
+            - '27017-27019:27017-27019'
+        # environment:
+        #     - MONGO_INITDB_DATABASE:'babymon'
+        networks:
+            - app-connect
+    babymon:
+        image: 'pedrotfs/babymon:latest'
+        environment:
+            - PORT=3000
+            - CONNECTION_URL=mongodb://mongodb-server/babymon
+            - TOKEN_SECRET=secret
+            - SENDGRID_API_KEY=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
+        depends_on:
+            - db
+        ports:
+            - 3000:3000
+        networks:
+            - app-connect
+        links:
+            - db
+networks:
+  app-connect:
+      driver: bridge

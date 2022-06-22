@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Storyteller</title> 
+       
+        <link rel="icon" type="image/png" href="/img/icon.jpeg">
+        <link rel="stylesheet" type="text/css" href="vendors/css/normalize.css">
+        <link rel="stylesheet" type="text/css" href="vendors/css/grid.css">                
+        <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;1,300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+        </script>
+    </head>
+    <body>
+        <header>
+            <div class="hero-text-box">
+                <h1><i>Story Teller</i></h1>
+            </div>
+        </header>       
+
+        <section class="section__registry">
+            <div class="section__registry--breadcrumb"> {{{breadCrumb}}}</div>
+            <div class="section__registry--level-nav">
+                {{{levelNav.levelNavAdd}}}
+                {{{levelNav.levelNavHome}}}
+                {{{levelNav.levelNavPrevious}}} 
+                {{{levelNav.levelNavTop}}} 
+                {{{levelNav.levelNavNext}}}
+                {{{levelNav.levelNavVoid}}}
+                {{{levelNav.levelNavDump}}}
+                {{{levelNav.levelNavRestore}}}
+            </div>
+            <div class="section__registry--single">
+                
+                <div class="section__registry--single--title"><h2>Tale 1</h2> </div>
+                <div class="section__registry--single--text">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore 
+                    magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo 
+                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla 
+                    pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim 
+                    id est laborum.
+                </div>
+                
+                <div class="section__registry--single--actions">                    
+                    <a class="button button-full" href="#">Edit</a>
+                    <a class="button button-full" href="#">Delete</a>
+                    <a class="button button-full" href="#">Add Child</a>                    
+                </div>                
+                
+                <div class="section__registry--accountables">
+                    <div class="section__registry--single--accountable"><ion-icon name="trophy-outline" class="icon-small"></ion-icon> <b>stuff: 5</b></div>
+                    <div class="section__registry--single--accountable"><ion-icon name="skull-outline" class="icon-small"></ion-icon> <b>words: 25</b></div>
+                    <div class="section__registry--single--accountable"><ion-icon name="fitness-outline" class="icon-small"></ion-icon> <b>questions: 7</b></div>
+                </div>
+
+                <center><hr class="hr-soft"></center>
+
+                <div class="section__registry--single--title">Book 1 &nbsp;&nbsp;&nbsp;<a class="button button-full" href="#">Remove</a></div>
+                <div class="section__registry--single--title">Book 2 &nbsp;&nbsp;&nbsp;<a class="button button-full" href="#">Remove</a></div>
+                <div class="section__registry--single--title">Book 3 &nbsp;&nbsp;&nbsp;<a class="button button-full" href="#">Remove</a></div>
+                <div class="section__registry--single--title">Book 4 &nbsp;&nbsp;&nbsp;<a class="button button-full" href="#">Remove</a></div>
+
+            </div>
+            <hr>
+            <div class="section__registry--list">
+
+                <ul class="section__registry-sibling-list">
+                    <li>Tale 2</li>
+                    <li>Tale 3</li>
+                    <li>Tale 4</li>
+                    
+                </ul>               
+            </div>       
+        </section>
+
+        <footer>
+            Health check - {{{this.connectionStatus}}}<br>
+            &copy; pedrotfs
+        </footer>
+        
+        <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/ionicons@5.0.0/dist/ionicons.js"></script>
+        <script src="/js/client-side-app.js"></script>
+        {{!-- good icons: 
+            footsteps-outline
+            golf-outline
+            diamond-outline
+            earth-outline
+            bonfire-outline
+            analytisc-outline
+            arrow-up-outline
+            chatbubbles-outline
+            globe-outline
+            fitness-outline
+            flask-outline
+            pulse-outline
+            ribbon-outline
+            school-outline
+            skull-outline
+            triangle-outline
+            trophy-outline
+            water-outline
+        --}}
+    </body>
+</html>
