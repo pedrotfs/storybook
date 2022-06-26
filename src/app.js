@@ -29,6 +29,7 @@ app.use(express.static(path.join(__dirname, "../public/")));
 
 // app.use(formRouter, () => {});
 app.use(mainRouter, () => {});
+app.set('etag', false);
 
 
 module.exports = app;

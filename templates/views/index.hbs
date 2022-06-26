@@ -29,19 +29,16 @@
                 {{{levelNav.levelNavDump}}}
                 {{{levelNav.levelNavRestore}}}
             </div>
+            {{#if selectedRegistry}}
             <div class="section__registry--single">
                 
-                <div class="section__registry--single--title"><h2>Tale 1</h2> </div>
+                <div class="section__registry--single--title"><h2>{{selectedRegistry.title}}</h2> </div>
                 <div class="section__registry--single--text">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore 
-                    magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo 
-                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla 
-                    pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim 
-                    id est laborum.
+                    {{selectedRegistry.text}}
                 </div>
                 
                 <div class="section__registry--single--actions">                    
-                    <a class="button button-full" href="#">Edit</a>
+                    <a class="button button-full" href="#" onclick="editRegistry('{{selectedRegistry.id}}')">Edit</a>
                     <a class="button button-full" href="#">Delete</a>
                     <a class="button button-full" href="#">Add Child</a>                    
                 </div>                
@@ -61,15 +58,20 @@
 
             </div>
             <hr>
+            {{/if}}
             <div class="section__registry--list">
-
+                <h2>{{currentLevel}}</h2>
                 <ul class="section__registry-sibling-list">
-                    <li>Tale 2</li>
-                    <li>Tale 3</li>
-                    <li>Tale 4</li>
-                    
-                </ul>               
-            </div>       
+                {{#each selectedRegistryTree}}
+                    <div onclick="selectRegistry('{{id}}', '{{name}}')">
+                        <li>
+                            {{title}}
+                        </li>
+                    </div>
+                {{/each}}
+                </ul>
+            </div>
+
         </section>
 
         <footer>

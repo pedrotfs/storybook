@@ -73,6 +73,17 @@ select {
     width: 90%;
 }
 
+ul {
+    text-align: left;
+    padding-left: 45%;
+    padding-right: 45%;
+    padding-top: 10px;
+}
+
+ul li {
+    padding-top: 10px;
+}
+
 /* style */
 .hero-text-box {
     position: absolute;
