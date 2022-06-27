@@ -18,14 +18,16 @@ function moveToAddRegistry(){
 
 function editRegistry(id){
     $.ajax({
-        url: '/add-registry',
+        url: '/edit-element',
         type: 'GET',
         data: {
             id: id
         },
         async: false,
         contentType: 'application/json; charset=utf-8',
-        success: window.location.href = '/add-registry'
+        success: window.location.href = function (response){
+            window.location.replace("/add-registry?id=" + response.id);
+        }
     });
 }
 
@@ -37,18 +39,36 @@ function clearAddRegistry(){
     document.getElementById("registryForm").reset();
 }
 
-function selectRegistry(id, name){    
-    console.log(new Date().getTime());    
+function deleteRegistry(id, type) {    
     $.ajax({
-        url: '/?' + new Date().getTime(),
+        url: '/delete-element',
         type: 'GET',
         data: {
-            name: name,
+            id: id,
+            type: type
+        },
+        contentType: 'application/json; charset=utf-8',
+        async: false,
+        success: function () {
+            document.location.replace("/");
+            document.location.reload(true);
+        }
+    });
+}
+
+function selectRegistry(id){
+    $.ajax({
+        url: '/select-element',
+        type: 'GET',
+        data: {
             id: id
         },
         contentType: 'application/json; charset=utf-8',
         async: false,
-        success: window.location.reload(true)
+        success: function (response) {
+            window.location.replace("/?id=" + response.id);
+        }
+
     });
 }
 

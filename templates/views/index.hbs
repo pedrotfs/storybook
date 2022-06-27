@@ -39,7 +39,7 @@
                 
                 <div class="section__registry--single--actions">                    
                     <a class="button button-full" href="#" onclick="editRegistry('{{selectedRegistry.id}}')">Edit</a>
-                    <a class="button button-full" href="#">Delete</a>
+                    <a class="button button-full" href="#" onclick="deleteRegistry('{{selectedRegistry.id}}', '{{currentLevel}}')">Delete</a>
                     <a class="button button-full" href="#">Add Child</a>                    
                 </div>                
                 
@@ -63,7 +63,7 @@
                 <h2>{{currentLevel}}</h2>
                 <ul class="section__registry-sibling-list">
                 {{#each selectedRegistryTree}}
-                    <div onclick="selectRegistry('{{id}}', '{{name}}')">
+                    <div onclick="selectRegistry('{{id}}')">
                         <li>
                             {{title}}
                         </li>

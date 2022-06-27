@@ -34,16 +34,15 @@
                     <div class="section__registry--single--title"><h2>Insert / Edit Registry</h2> </div>
                     <div class="section__registry--single--add">
                     
-                        <div class="section__registry--single--form-line-top">
-                            {{registry.title}} 111111111111
-                            Title: <input type="text" name="title" placeholder="{{{registry.title}}}"/> 
+                        <div class="section__registry--single--form-line-top">                            
+                            Title: <input type="text" name="title" value="{{{registry.title}}}"/> 
                         </div>
 
                         <div class="section__registry--single--form-line-registry-select">
                             Type: 
                             <select name="type">
                                 {{#each hierarchyList}}
-                                <option value="{{this}}">
+                                <option value="{{this}}" {{#equals this currentLevel}} selected {{/equals}}">
                                     {{this}}
                                 </option>
                                 {{/each}}
@@ -51,20 +50,20 @@
                         </div>
 
                         <div class="section__registry--single--form-line">
-                            Name: <input type="text" name="name"/> 
+                            Name: <input type="text" name="name" value="{{{registry.name}}}"/> 
                         </div>
                         <div class="section__registry--single--form-line">
-                            Time: <input type="text" name="time"/> 
+                            Time: <input type="text" name="time" value="{{{registry.time}}}"/> 
                         </div>
                         <div class="section__registry--single--form-text-area">
                             <label for="text">Text:</label>
-                            <textarea name="text"> </textarea>
+                            <textarea name="text">{{{registry.text}}}</textarea>
                         </div>
                         <div class="section__registry--single--form-line">
-                            Order: <input type="text" name="orderIndex"/> 
+                            Order: <input type="text" name="orderIndex" value="{{{registry.orderIndex}}}"/> 
                         </div>
                         <div class="section__registry--single--form-line">
-                            Image: <input type="text" name="imgPath"/> 
+                            Image: <input type="text" name="imgPath" value="{{{registry.imgPath}}}"/> 
                         </div>
                     </div>                
                     
@@ -72,7 +71,7 @@
                         <a class="button button-full" href="#" onclick="submitAddRegistry()">Submit</a>
                         <a class="button button-full" href="#" onclick="clearAddRegistry()">Reset</a>
                     </div>
-
+                    <input type="hidden" value="{{{registry.id}}}" name="id" />
                 </form>
             </div>
             <hr>            

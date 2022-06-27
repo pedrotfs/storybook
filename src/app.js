@@ -24,12 +24,20 @@ app.set("views", path.join(__dirname, "../templates/views"));
 //hbs.registerPartials(path.join(__dirname, "../templates/partials"));
 hbs.registerHelper('isdefined', function (value) {
     return value !== undefined;
-  });
+});
+hbs.registerHelper('equals', function (v1, v2) {
+    console.log("equals helper: " + v1 == v2);
+    return v1 == v2;
+});
 app.use(express.static(path.join(__dirname, "../public/")));
 
 // app.use(formRouter, () => {});
 app.use(mainRouter, () => {});
 app.set('etag', false);
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store');
+    next();
+})
 
 
 module.exports = app;

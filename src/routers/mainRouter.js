@@ -1,6 +1,8 @@
 const express = require("express")
 const router = new express.Router()
 const request = require('request-promise').defaults({ encoding: 'latin1' });
+const axios = require('axios').default;
+const url = require('url');
 
 const baseUrl = process.env.BACKEND_URL;
 
@@ -143,7 +145,8 @@ router.get("/add-registry", async (req, res) => {
     if(selectedRegistry != undefined && selectedRegistry != "") {
         try {
             console.log("fetching for edit : " + selectedRegistry);
-            registry = await findRegistryAndLevel(selectedRegistry);                        
+            registry = await findRegistryAndLevel(selectedRegistry);
+            currentLevel = registry.currentLevel;
             registry = registry.registryJson;
         } catch (err) {
             //ok
@@ -206,11 +209,11 @@ router.post("/add-registry-submit", async (req, res) => {
     formJson.time = requestBody.time;
     formJson.type = requestBody.type;
     formJson.owner = "admin";
-    formJson.id = "";
+    formJson.id = requestBody.id;
     console.log(formJson);
 
-    const url = await getUrlFromType(baseUrl, req.body.type, "add");
-    console.log(url);    
+    const urllocal = await getUrlFromType(baseUrl, req.body.type, "add");
+    console.log(urllocal);    
     
     const form = await removeFieldsAccordingToType(formJson, formJson.type);
     console.log(form);
@@ -220,7 +223,7 @@ router.post("/add-registry-submit", async (req, res) => {
         headers: {
             'content-type' : 'application/json; charset=utf-8'
         },
-        url,
+        url:urllocal,
         encoding: 'latin1',
         body: JSON.stringify(form)
     });
@@ -235,39 +238,33 @@ const removeFieldsAccordingToType = async (form) => {
     return form;
 }
 
-const getUrlFromType = async(url,type, operation) => {    
-    const req = await request.get(baseUrl + "util/hierarchy/", async (error, response)=> {        
-        if(error) {
-            console.log("error on url from hierarchy");
-        }
-    });
+const getUrlFromType = async(urllocal,type, operation) => {    
+    const req = await request.get(baseUrl + "util/hierarchy/");    
     if(req) {
         console.log("hierarchy returned: " + req);
         hierarchy = req;       
     } else {    
         console.log("error querying registry order; using default.")
-        hierarchy = "Tale;Book;Chapter;Paragraph";
+        hierarchy = "Tales;Books;Chapters;Paragraphs";
     }
     let hierarchySplit = hierarchy.split(";");       
-    let result = "error";
-    hierarchySplit.forEach(arrayElement => {        
-        if(arrayElement === type) {
-            if(type == "Tale") {
-                result = url + "tales/" +  getOperation(operation);
-            } else if(type == "Book") {
-                result = url + "books/" +  getOperation(operation);
-            } else if(type == "Section") {
-                result = url + "sections/" +  getOperation(operation);
-            } else if(type == "Chapter") {
-                result = url + "chapters/" +  getOperation(operation);
-            } else if(type == "Paragraph") {
-                result = url + "paragraphs/" +  getOperation(operation);
-            } else if(type == "Accountable") {
-                result = url + "accountables/" +  getOperation(operation);
+    let result = "errorUrlFromTypeAndOperation";
+    hierarchySplit.forEach(arrayElement => {
+        if(arrayElement == type) {            
+            console.log(type);
+            if(type == "Tale" || type == "Tales") {
+                result = urllocal + "tales/" +  getOperation(operation);
+            } else if(type == "Book" || type == "Books") {
+                result = urllocal + "books/" +  getOperation(operation);
+            } else if(type == "Section" || type == "Sections") {
+                result = urllocal + "sections/" +  getOperation(operation);
+            } else if(type == "Chapter" || type == "Chapters") {
+                result = urllocal + "chapters/" +  getOperation(operation);
+            } else if(type == "Paragraph" || type == "Paragraphs") {
+                result = urllocal + "paragraphs/" +  getOperation(operation);
+            } else if(type == "Accountable" || type == "Accountables") {
+                result = urllocal + "accountables/" +  getOperation(operation);
             }
-        }const getRegistryList = async (type) => {
-            await request(baseUrl + "/actuator/health", (error, response, body) => {
-            })
         }
     });
     return result; 
@@ -278,16 +275,13 @@ const getOperation = (operation) => {
         return "addChild/";
     } else if (operation === "delChild") {
         return "delChild/";
+    // } else if (operation === "delete") {
+    //     return "delete/";
     } else if (operation === "all") {
-        return "all/";
-    } else {
-        return "";
+        return "all";
     }
-}
+    return "";
 
-const getRegistryList = async (type) => {
-    await request(baseUrl + "/actuator/health", (error, response, body) => {
-    })
 }
 
 router.get("/undefine", async (req, res) => {
@@ -297,5 +291,47 @@ router.get("/undefine", async (req, res) => {
     selectedRegistryTree = undefined;
     res.render("index");
 })
+
+router.get("/select-element", async (req, res) => {
+    console.log(req.param("id"));
+    res.status(200).send({id: req.param("id")});
+})
+
+router.get("/edit-element", async (req, res) => {
+    res.status(200).send({id: req.param("id")});
+})
+
+router.get("/delete-element", async (req, res) => {
+    let id = req.param("id");
+    let type = req.param("type");    
+    try {
+        let registry = await findRegistryAndLevel(selectedRegistry);
+        let currentLevel = registry.currentLevel;
+        registry = registry.registryJson;
+        console.log("trying my luck");
+        console.log(type);
+        console.log(id);
+        const urllocal = await getUrlFromType(baseUrl, type, "delete") + id;        
+        console.log(urllocal);        
+        await axios.delete(urllocal);
+    } catch (error) {
+        //ok
+    }
+    console.log("hit1");
+    selectedRegistry = undefined;
+    selectedRegistryObject = undefined;
+    selectedRegistryTree = undefined;
+    res.status(200).redirect("/element-deleted");
+})
+
+router.get("/element-deleted", async (req, res) => {
+    console.log("hit2");
+    //res.status(200).redirect("/?timestamp=" + new Date().getTime);
+    //res.redirect(url.parse(req.url).pathname);
+    //res.status(200).render("/");
+    res.status(200).redirect("/");
+})
+
+
 
 module.exports = router;
