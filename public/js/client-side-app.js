@@ -16,6 +16,15 @@ function moveToAddRegistry(){
     });
 }
 
+function moveToAddAccountable(){
+    $.ajax({
+        url: '/add-accountable',
+        type: 'GET',
+        contentType: 'application/json; charset=utf-8',
+        success: window.location.href = '/add-accountable'
+    });
+}
+
 function editRegistry(id){
     $.ajax({
         url: '/edit-element',
@@ -31,11 +40,11 @@ function editRegistry(id){
     });
 }
 
-function submitAddRegistry(){    
+function submitForm(){    
     document.getElementById("registryForm").submit();
 }
 
-function clearAddRegistry(){
+function clearForm(){
     document.getElementById("registryForm").reset();
 }
 
@@ -72,13 +81,35 @@ function selectRegistry(id){
     });
 }
 
-/*
-function addSleepCycle(){
-    //const id = document.querySelector('.userId').value
+function addChild(id){
     $.ajax({
-        url: '/',
+        url: '/add-child',
         type: 'GET',
+        data: {
+            id: id
+        },
         contentType: 'application/json; charset=utf-8',
-        success: window.location.href = '/'
+        async: false,
+        success: function () {
+            document.location.replace("/add-child?id=" + id);
+        }
     });
-}*/
+}
+
+function delChild(father, id, level){
+    $.ajax({
+        url: '/del-child',
+        type: 'GET',
+        data: {
+            father: father,
+            id: id,
+            level: level
+        },
+        contentType: 'application/json; charset=utf-8',
+        async: false,
+        success: function () {
+            document.location.replace("/");
+            document.location.reload(true);
+        }
+    });
+}

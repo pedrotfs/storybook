@@ -30,40 +30,24 @@
                 {{{levelNav.levelNavRestore}}}
             </div>
             <div class="section__registry--single">
-                <form name="registryForm" id="registryForm" action="/add-registry-submit" method="post">
-                    <div class="section__registry--single--title"><h2>Insert / Edit Registry</h2> </div>
+                <form name="registryForm" id="registryForm" action="/add-accountable-submit" method="post">
+                    <div class="section__registry--single--title"><h2>Insert / Edit Accountable</h2> </div>
                     <div class="section__registry--single--add">
                     
                         <div class="section__registry--single--form-line-top">                            
-                            Title: <input type="text" name="title" value="{{{registry.title}}}"/> 
-                        </div>
-
-                        <div class="section__registry--single--form-line-registry-select">
-                            Type: 
-                            <select name="type">
-                                {{#each hierarchyList}}
-                                <option value="{{this}}" {{#equals this currentLevel}} selected {{/equals}}>
-                                    {{this}}
-                                </option>
-                                {{/each}}
-                            </select>
-                        </div>
-
-                        <div class="section__registry--single--form-line">
-                            Name: <input type="text" name="name" value="{{{registry.name}}}"/> 
+                            Title: <input type="text" name="title" value="{{{accountable.title}}}"/> 
                         </div>
                         <div class="section__registry--single--form-line">
-                            Time: <input type="text" name="time" value="{{{registry.time}}}"/> 
-                        </div>
-                        <div class="section__registry--single--form-text-area">
-                            <label for="text">Text:</label>
-                            <textarea name="text">{{{registry.text}}}</textarea>
+                            Name: <input type="text" name="name" value="{{{accountable.name}}}"/> 
                         </div>
                         <div class="section__registry--single--form-line">
-                            Order: <input type="text" name="orderIndex" value="{{{registry.orderIndex}}}"/> 
+                            Amount: <input type="text" name="amount" value="{{{accountable.amount}}}"/> 
                         </div>
                         <div class="section__registry--single--form-line">
-                            Image: <input type="text" name="imgPath" value="{{{registry.imgPath}}}"/> 
+                            Icon: <input type="text" name="imgPath" value="{{{accountable.ionIcon}}}"/> 
+                        </div>
+                        <div class="section__registry--single--form-line">
+                            Visible: <input type="checkbox" name="imgPath" value="{{{accountable.visible}}}"/> 
                         </div>
                     </div>                
                     
@@ -71,7 +55,7 @@
                         <a class="button button-full" href="#" onclick="submitForm()">Submit</a>
                         <a class="button button-full" href="#" onclick="clearForm()">Reset</a>
                     </div>
-                    <input type="hidden" value="{{{registry.id}}}" name="id" />
+                    <input type="hidden" value="{{{accountable.id}}}" name="id" />
                 </form>
             </div>
             <hr>            

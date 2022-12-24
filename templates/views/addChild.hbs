@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Storyteller</title> 
+       
+        <link rel="icon" type="image/png" href="/img/icon.jpeg">
+        <link rel="stylesheet" type="text/css" href="vendors/css/normalize.css">
+        <link rel="stylesheet" type="text/css" href="vendors/css/grid.css">                
+        <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;1,300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+        </script>
+    </head>
+    <body>
+        <header>
+            <div class="hero-text-box">
+                <h1><i>Story Teller</i></h1>
+            </div>
+        </header>       
+
+        <section class="section__registry">
+            <div class="section__registry--breadcrumb"> {{{breadCrumb}}}</div>
+            <div class="section__registry--level-nav">
+                {{{levelNav.levelNavAdd}}}
+                {{{levelNav.levelNavHome}}}
+                {{{levelNav.levelNavPrevious}}} 
+                {{{levelNav.levelNavTop}}} 
+                {{{levelNav.levelNavNext}}}
+                {{{levelNav.levelNavVoid}}}
+                {{{levelNav.levelNavDump}}}
+                {{{levelNav.levelNavRestore}}}
+            </div>
+            
+            <div class="section__registry--single">
+                <div class="section__registry--single--title"><h2>Add Child</h2> </div>
+
+                <form name="registryForm" id="registryForm" action="/add-child-submit" method="post">
+
+                    <div class="section__registry--single--form-line">
+                            ID: <input type="text" name="child"/> 
+                    </div>
+
+                    <div class="section__registry--single--actions">                    
+                        <a class="button button-full" href="#" onclick="submitForm()">Submit</a>
+                        <a class="button button-full" href="#" onclick="clearForm()">Reset</a>
+                    </div>
+                    <input type="hidden" value="{{{id}}}" name="id" />
+                    <input type="hidden" value="{{{currentLevel}}}" name="type" />
+                </form>
+            </div>            
+            
+            <div class="section__registry--list">
+                <h2>{{currentLevel}}</h2>
+                <ul class="section__registry-sibling-list">
+                {{#each selectedRegistryTree}}
+                    <div onclick="selectRegistry('{{id}}')">
+                        <li>
+                            {{title}}
+                        </li>
+                    </div>
+                {{/each}}
+                </ul>
+            </div>
+
+        </section>
+
+        <footer>
+            Health check - {{{this.connectionStatus}}}<br>
+            &copy; pedrotfs
+        </footer>
+        
+        <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/ionicons@5.0.0/dist/ionicons.js"></script>
+        <script src="/js/client-side-app.js"></script>
+        {{!-- good icons: 
+            footsteps-outline
+            golf-outline
+            diamond-outline
+            earth-outline
+            bonfire-outline
+            analytisc-outline
+            arrow-up-outline
+            chatbubbles-outline
+            globe-outline
+            fitness-outline
+            flask-outline
+            pulse-outline
+            ribbon-outline
+            school-outline
+            skull-outline
+            triangle-outline
+            trophy-outline
+            water-outline
+        --}}
+    </body>
+</html>

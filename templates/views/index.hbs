@@ -33,31 +33,46 @@
             <div class="section__registry--single">
                 
                 <div class="section__registry--single--title"><h2>{{selectedRegistry.title}}</h2> </div>
+                <div class="section__registry--single--id">({{selectedRegistry.id}})</div>
                 <div class="section__registry--single--text">
                     {{selectedRegistry.text}}
-                </div>
+                </div>                
                 
                 <div class="section__registry--single--actions">                    
                     <a class="button button-full" href="#" onclick="editRegistry('{{selectedRegistry.id}}')">Edit</a>
                     <a class="button button-full" href="#" onclick="deleteRegistry('{{selectedRegistry.id}}', '{{currentLevel}}')">Delete</a>
-                    <a class="button button-full" href="#">Add Child</a>                    
-                </div>                
-                
+                    <a class="button button-full" href="#" onclick="addChild('{{selectedRegistry.id}}')">Add Child</a>
+                    {{#if showAddAccountables}}
+                        <a class="button button-full" href="#" onclick="moveToAddAccountable('{{selectedRegistry.id}}')">Add Accountable</a>                        
+                    {{/if}}
+                </div>
+                {{#if selectedRegistry.imgPath}}
+                    <section class="section--image-frame">
+                        <div class="imgPanel">
+                            <img src="{{{selectedRegistry.imgPath}}}" alt="{{{registry.title}}}"/>
+                        </div>
+                    </section>
+                {{/if}}                
+
                 <div class="section__registry--accountables">
                     <div class="section__registry--single--accountable"><ion-icon name="trophy-outline" class="icon-small"></ion-icon> <b>stuff: 5</b></div>
                     <div class="section__registry--single--accountable"><ion-icon name="skull-outline" class="icon-small"></ion-icon> <b>words: 25</b></div>
                     <div class="section__registry--single--accountable"><ion-icon name="fitness-outline" class="icon-small"></ion-icon> <b>questions: 7</b></div>
                 </div>
-
-                <center><hr class="hr-soft"></center>
-
-                <div class="section__registry--single--title">Book 1 &nbsp;&nbsp;&nbsp;<a class="button button-full" href="#">Remove</a></div>
-                <div class="section__registry--single--title">Book 2 &nbsp;&nbsp;&nbsp;<a class="button button-full" href="#">Remove</a></div>
-                <div class="section__registry--single--title">Book 3 &nbsp;&nbsp;&nbsp;<a class="button button-full" href="#">Remove</a></div>
-                <div class="section__registry--single--title">Book 4 &nbsp;&nbsp;&nbsp;<a class="button button-full" href="#">Remove</a></div>
-
+                {{#if selectedRegistry.children}}
+                    {{#if selectedRegistry.children.length}}
+                        <div class="section--children">
+                            {{#each selectedRegistry.children}}
+                                <div class="section__registry--single--title" onclick="selectRegistry('{{id}}')">
+                                    {{title}} &nbsp;&nbsp;&nbsp;                                    
+                                </div>
+                                <a class="button button-full" href="#" onclick="delChild('{{father}}', '{{id}}' , '{{level}}')">Remove</a>
+                            {{/each}}
+                            
+                        </div>
+                    {{/if}}
+                {{/if}}
             </div>
-            <hr>
             {{/if}}
             <div class="section__registry--list">
                 <h2>{{currentLevel}}</h2>

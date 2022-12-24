@@ -119,8 +119,8 @@ ul li {
 .section__registry--single {
     padding-top: 10px;
     padding-bottom: 10px;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 0px;
+    padding-right: 0px;
     /* text-align: center; */
     text-align: center;
 }
@@ -128,6 +128,14 @@ ul li {
 .section__registry--single--title {
     padding: 10px;
     padding-bottom: 20px;
+}
+
+.section__registry--single--id {
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 20px;
+    
+    text-align: center;
 }
 
 .section__registry--single--accountable {
@@ -139,6 +147,8 @@ ul li {
     text-align: justify;
     padding-bottom: 20px;
     padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .section__registry--single--actions {
@@ -217,11 +227,6 @@ ul li {
     vertical-align: middle;
 }
 
-.section__registry--accountables {
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-
 /* buttons */
 .button:link,
 .button:visited,
@@ -249,4 +254,30 @@ input[type=submit]:hover, input[type=submit]:active {
 .hr-soft {
     width: 2%;
     margin-bottom: 10px;
+}
+
+.imgPanel img {
+    width: 75%;
+    height: 75%;
+    padding-left: 30px;
+    padding-right: 30px;
+    border-radius: 40px;
+    border: 1px #3b210a;
+}
+
+.section--image-frame {
+    background-color: #efefef;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.section__registry--accountables {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.section--children {
+    background-color: #efefef;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
