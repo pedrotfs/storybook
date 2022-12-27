@@ -44,10 +44,7 @@
                             Amount: <input type="text" name="amount" value="{{{accountable.amount}}}"/> 
                         </div>
                         <div class="section__registry--single--form-line">
-                            Icon: <input type="text" name="imgPath" value="{{{accountable.ionIcon}}}"/> 
-                        </div>
-                        <div class="section__registry--single--form-line">
-                            Visible: <input type="checkbox" name="imgPath" value="{{{accountable.visible}}}"/> 
+                            Icon: <input type="text" name="ionIcon" value="{{{accountable.ionIcon}}}"/> 
                         </div>
                     </div>                
                     
@@ -55,7 +52,7 @@
                         <a class="button button-full" href="#" onclick="submitForm()">Submit</a>
                         <a class="button button-full" href="#" onclick="clearForm()">Reset</a>
                     </div>
-                    <input type="hidden" value="{{{accountable.id}}}" name="id" />
+                    <input type="hidden" value="{{{registry.id}}}" name="id" />
                 </form>
             </div>
             <hr>            

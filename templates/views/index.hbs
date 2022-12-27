@@ -41,9 +41,9 @@
                 <div class="section__registry--single--actions">                    
                     <a class="button button-full" href="#" onclick="editRegistry('{{selectedRegistry.id}}')">Edit</a>
                     <a class="button button-full" href="#" onclick="deleteRegistry('{{selectedRegistry.id}}', '{{currentLevel}}')">Delete</a>
-                    <a class="button button-full" href="#" onclick="addChild('{{selectedRegistry.id}}')">Add Child</a>
+                    <a class="button button-full" href="#" onclick="addChild('{{selectedRegistry.id}}')">Add Child</a>   
                     {{#if showAddAccountables}}
-                        <a class="button button-full" href="#" onclick="moveToAddAccountable('{{selectedRegistry.id}}')">Add Accountable</a>                        
+                        <a class="button button-full" href="#" onclick="moveToAddAccountable('{{selectedRegistry.id}}')">Add Accountable</a>                                         
                     {{/if}}
                 </div>
                 {{#if selectedRegistry.imgPath}}
@@ -55,9 +55,16 @@
                 {{/if}}                
 
                 <div class="section__registry--accountables">
-                    <div class="section__registry--single--accountable"><ion-icon name="trophy-outline" class="icon-small"></ion-icon> <b>stuff: 5</b></div>
-                    <div class="section__registry--single--accountable"><ion-icon name="skull-outline" class="icon-small"></ion-icon> <b>words: 25</b></div>
-                    <div class="section__registry--single--accountable"><ion-icon name="fitness-outline" class="icon-small"></ion-icon> <b>questions: 7</b></div>
+                    {{#if accumulatedAccountables}}
+                        {{#each accumulatedAccountables}}
+                            <div class="section__registry--single--accountable"><ion-icon name="{{ionIcon}}" class="icon-small"></ion-icon> <b>{{title}}: {{amount}}</b></div>
+                        {{/each}}
+                        <!-- 
+                            <div class="section__registry--single--accountable"><ion-icon name="trophy-outline" class="icon-small"></ion-icon> <b>stuff: 5</b></div>
+                            <div class="section__registry--single--accountable"><ion-icon name="skull-outline" class="icon-small"></ion-icon> <b>words: 25</b></div>
+                            <div class="section__registry--single--accountable"><ion-icon name="fitness-outline" class="icon-small"></ion-icon> <b>questions: 7</b></div>
+                        -->
+                    {{/if}}
                 </div>
                 {{#if selectedRegistry.children}}
                     {{#if selectedRegistry.children.length}}

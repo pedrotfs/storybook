@@ -10,10 +10,12 @@ var selectedRegistry = undefined;
 var selectedRegistryObject = undefined;
 var selectedRegistryTree = undefined;
 
-var breadCrumb = "Tale 1 > Book 1 > Section 1";
+var breadCrumb = " > ";
 var levelNavHome = '<ion-icon name="home-outline" class="icon-small-level-nav" onclick="moveToIndex()"></ion-icon>';
 var levelNavAdd = '<ion-icon name="add-circle-outline" class="icon-small-level-nav" onclick="moveToAddRegistry()"></ion-icon>';
 var currentLevel = "List";
+var hierarchyList;
+var selectedHierarchy;
 
 /** home - list - selected */
 router.get("/", async (req, res) => {    
@@ -25,9 +27,25 @@ router.get("/", async (req, res) => {
     } catch (err) {
         //
     }
-    console.log("\n\naccess root\n\n");    
+    console.log("---------------------------------------------- \naccess root\n----------------------------------------------");
+    
+    /** this repeats for now */
+    let hierarchy = "Tale;Book;Chapter;Paragraph";
+    const hierarquyResquest = await axios.get(baseUrl + "util/hierarchy/");    
+    hierarchy = hierarquyResquest;
+    try {
+        const hierarquyResquest = await request.get(baseUrl + "util/hierarchy/");
+        hierarchy = hierarquyResquest;
+    } catch (err) {
+        console.log("error recovering hierarchy. using defaults")
+    }   
 
-    breadCrumb = "Tale 1 > Book 1 > Section 1";    
+    let hierarchySplit = hierarchy.split(";");
+    let hierarchyList = [];
+    hierarchySplit.forEach(arrayElement => {
+        hierarchyList.push(arrayElement);
+    })
+    console.log(hierarchyList);    
 
     let levelNavNext = '<ion-icon name="arrow-forward-outline" class="icon-small-level-nav"></ion-icon>'
     let levelNavPrevious = '<ion-icon name="arrow-back-outline" class="icon-small-level-nav"></ion-icon>';
@@ -40,7 +58,9 @@ router.get("/", async (req, res) => {
     selectedRegistry = req.param("id");
 
     console.log("selectedRegistry");
-    console.log(req.param("id"));                
+    console.log(req.param("id"));
+    
+    let accumulatedAccountables;
 
     //get list
     
@@ -57,6 +77,8 @@ router.get("/", async (req, res) => {
             selectedRegistryObject = selectedRegistryObject.registryJson;
             selectedRegistryTree = JSON.parse(await request.get(baseUrl + currentLevel.toLowerCase() + "/all"));
             
+            accumulatedAccountables = await getAccountablesForRegistryId(selectedRegistryObject.id);
+
             //filthy hack
             console.log("fetching children");
             selectedRegistryObject.children = [];
@@ -70,8 +92,9 @@ router.get("/", async (req, res) => {
             } else if(selectedRegistryObject.paragraphs != undefined && selectedRegistryObject.paragraphs.length > 0) {
                 childList = selectedRegistryObject.paragraphs;
             } else if(selectedRegistryObject.accountables != undefined && selectedRegistryObject.accountables.length > 0) {                
-                childList = selectedRegistryObject.accountables;                
+                childList = selectedRegistryObject.accountables;             
             }
+            breadCrumb = await getBreadCrumb(currentLevel, selectedRegistryObject.title, hierarchyList);            
         }
     } catch (err) {
         //
@@ -92,7 +115,7 @@ router.get("/", async (req, res) => {
 
     console.log("\n\nprerender\n\n");
 
-    const showAddAccountables = currentLevel == "Paragraphs";
+    const showAddAccountables = currentLevel == "Paragraphs";    
 
     console.log("selectedRegistry\n");
     console.log(selectedRegistry);
@@ -104,6 +127,8 @@ router.get("/", async (req, res) => {
     console.log(selectedRegistryObject);
     console.log("\n\n\\prerender\n\n");
 
+    
+
     res.render("index", {
             connectionStatus,
             breadCrumb,
@@ -111,9 +136,37 @@ router.get("/", async (req, res) => {
             selectedRegistry: selectedRegistryObject,
             selectedRegistryTree,
             currentLevel,
-            showAddAccountables
+            showAddAccountables,
+            accumulatedAccountables
     });
 })
+
+const getAccountablesForRegistryId = async (id) => {    
+    console.log(selectedRegistryObject);
+    try {
+        accumulatedAccountables = await axios.get(baseUrl + "accountables/accountables-for-entity/" + selectedRegistryObject.id);
+        console.log("Accumulated Accountables from " + selectedRegistryObject.id);
+        console.log(accumulatedAccountables.data);
+        
+    } catch (err) {
+        console.log("error trying to get all accountables for registry.");
+    }
+    return accumulatedAccountables.data;
+}
+
+const getBreadCrumb = async (currentLevel, currentTitle, hierarchyList) => {
+    let breadCrumb = "";
+    for(const element of hierarchyList) {
+        if(element == currentLevel) {
+            breadCrumb = breadCrumb + " > " + currentTitle;
+            break;
+        } else {
+            breadCrumb = breadCrumb + " > " + element;
+        }
+    }
+    return breadCrumb;
+    
+}
 
 const findRegistryAndLevel = async (id) => {
     let registry = undefined;
@@ -167,7 +220,25 @@ const findRegistryAndLevel = async (id) => {
 }
 
 /** add - edit */
-router.get("/add-registry", async (req, res) => {    
+router.get("/add-registry", async (req, res) => {
+
+    /** this repeats for now */
+    let hierarchy = "Tale;Book;Chapter;Paragraph";
+    const hierarquyResquest = await axios.get(baseUrl + "util/hierarchy/");    
+    hierarchy = hierarquyResquest;
+    try {
+        const hierarquyResquest = await request.get(baseUrl + "util/hierarchy/");
+        hierarchy = hierarquyResquest;
+    } catch (err) {
+        console.log("error recovering hierarchy. using defaults")
+    }   
+
+    let hierarchySplit = hierarchy.split(";");
+    let hierarchyList = [];
+    hierarchySplit.forEach(arrayElement => {
+        hierarchyList.push(arrayElement);
+    })
+    console.log(hierarchyList);  
     
     console.log("add registry form");
     let connectionStatus;
@@ -197,23 +268,6 @@ router.get("/add-registry", async (req, res) => {
             console.log("not found");
         }
     }
-    
-    let hierarchy = "Tale;Book;Chapter;Paragraph";
-    let selectedHierarchy = "Tale";
-
-    try {
-        const hierarquyResquest = await request.get(baseUrl + "util/hierarchy/");
-        hierarchy = hierarquyResquest;
-    } catch (err) {
-        console.log("error recovering hierarchy. using defaults")
-    }
-
-    let hierarchySplit = hierarchy.split(";");
-    let hierarchyList = [];
-    hierarchySplit.forEach(arrayElement => {
-        hierarchyList.push(arrayElement);
-    })
-    console.log(hierarchyList);
     
     breadCrumb = "Add new registry > ";
 
@@ -288,7 +342,7 @@ router.get("/add-accountable", async (req, res) => {
     })
     console.log(hierarchyList);
     
-    breadCrumb = "Add new registry > ";
+    breadCrumb = "Add new Accountable > ";
 
     var levelNavNext = '<ion-icon name="arrow-forward-outline" class="icon-small-level-nav-hidden"></ion-icon>'
     var levelNavPrevious = '<ion-icon name="arrow-back-outline" class="icon-small-level-nav-hidden"></ion-icon>';
@@ -355,9 +409,9 @@ router.post("/add-accountable-submit", async (req, res) => {
     const formJson = {};
     formJson.title = requestBody.title;
     formJson.name = requestBody.name;
-    formJson.orderIndex = requestBody.ionIcon;
-    formJson.text = requestBody.amount;
-    formJson.imgPath = requestBody.visible;
+    formJson.ionIcon = requestBody.ionIcon;
+    formJson.amount = requestBody.amount;
+    formJson.visible = true;
     formJson.type = "Accountable";
     
     formJson.id = requestBody.id;
@@ -378,7 +432,7 @@ router.post("/add-accountable-submit", async (req, res) => {
         encoding: 'latin1',
         body: JSON.stringify(form)
     });
-    res.status(200).redirect("/add-registry");
+    res.status(200).redirect("/add-accountable");
 })
 
 const removeFieldsAccordingToType = async (form) => {
@@ -447,6 +501,8 @@ router.get("/undefine", async (req, res) => {
     selectedRegistry = undefined;
     selectedRegistryObject = undefined;
     selectedRegistryTree = undefined;
+    breadCrumb = " > ";
+    currentLevel = "Tales";
     res.render("index");
 })
 
