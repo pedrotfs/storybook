@@ -14,8 +14,8 @@ var breadCrumb = " > ";
 var levelNavHome = '<ion-icon name="home-outline" class="icon-small-level-nav" onclick="moveToIndex()"></ion-icon>';
 var levelNavAdd = '<ion-icon name="add-circle-outline" class="icon-small-level-nav" onclick="moveToAddRegistry()"></ion-icon>';
 var currentLevel = "List";
-var hierarchyList;
 var selectedHierarchy;
+var navigation = {};
 
 /** home - list - selected */
 router.get("/", async (req, res) => {    
@@ -52,7 +52,7 @@ router.get("/", async (req, res) => {
     let levelNavTop = '<ion-icon name="arrow-up-outline" class="icon-small-level-nav" ></ion-icon>';
     let levelNavVoid = '<ion-icon name="arrow-up-outline" class="icon-small-level-nav-hidden" ></ion-icon>';
     let levelNavDump = '<ion-icon name="save-outline" class="icon-small-level-nav" ></ion-icon>';
-    let levelNavRestore = '<ion-icon name="download-outline" class="icon-small-level-nav"></ion-icon>';        
+    let levelNavRestore = '<ion-icon name="download-outline" class="icon-small-level-nav"></ion-icon>';
     let levelNav = {levelNavPrevious, levelNavTop, levelNavNext, levelNavHome, levelNavAdd, levelNavVoid, levelNavDump, levelNavRestore};
 
     selectedRegistry = req.param("id");
@@ -94,7 +94,19 @@ router.get("/", async (req, res) => {
             } else if(selectedRegistryObject.accountables != undefined && selectedRegistryObject.accountables.length > 0) {                
                 childList = selectedRegistryObject.accountables;             
             }
-            breadCrumb = await getBreadCrumb(currentLevel, selectedRegistryObject.title, hierarchyList);            
+            
+            breadCrumb = await getBreadCrumb(currentLevel, selectedRegistryObject.title, hierarchyList);           
+            await getNextAndPreviousLinks(selectedRegistryObject.id);
+            if(navigation.next) {
+                levelNavNext = '<ion-icon name="arrow-forward-outline" class="icon-small-level-nav" onclick="selectRegistry(\'' + navigation.next + '\')"></ion-icon>'
+            }
+            if(navigation.previous) {
+                levelNavPrevious = '<ion-icon name="arrow-back-outline" class="icon-small-level-nav" onclick="selectRegistry(\'' + navigation.previous + '\')"></ion-icon>';
+            }
+            if(navigation.top) {
+                levelNavTop = '<ion-icon name="arrow-up-outline" class="icon-small-level-nav" onclick="selectRegistry(\'' + navigation.top + '\')"></ion-icon>';
+            }
+            levelNav = {levelNavPrevious, levelNavTop, levelNavNext, levelNavHome, levelNavAdd, levelNavVoid, levelNavDump, levelNavRestore};
         }
     } catch (err) {
         //
@@ -140,6 +152,42 @@ router.get("/", async (req, res) => {
             accumulatedAccountables
     });
 })
+
+const getNextAndPreviousLinks = async (registryId) => {
+    navigation = {};
+    let previous;
+    let first;
+    let found = false;
+    if(selectedRegistryTree) {
+        for(const element of selectedRegistryTree) {
+            if(!first) {
+                first = element;
+            }
+            if(element.id == registryId) {
+                navigation.previous = previous.id;
+                found = true;
+            } else {
+                if(found) {
+                    navigation.next = element.id;
+                    break;
+                } else {
+                    previous = element;
+                }
+            }
+        }
+
+    }
+    try {
+        let response = await axios.get(baseUrl + "util/find-parent/" + registryId);
+        console.log("finding parent for navigation for " + registryId);
+        if(response.data) {
+            console.log("parent found: " + response.data);
+            navigation.top = response.data;
+        }
+    } catch (err) {
+        //Ok, dont populate navigation object
+    }
+}
 
 const getAccountablesForRegistryId = async (id) => {    
     console.log(selectedRegistryObject);
@@ -503,6 +551,7 @@ router.get("/undefine", async (req, res) => {
     selectedRegistryTree = undefined;
     breadCrumb = " > ";
     currentLevel = "Tales";
+    navigation = {};
     res.render("index");
 })
 
