@@ -7,21 +7,27 @@ function moveToIndex(){
     });
 }
 
-function moveToAddRegistry(){
+function moveToAddRegistry(parentId){
     $.ajax({
         url: '/add-registry',
         type: 'GET',
+        data: {
+            parentId: parentId
+        },
         contentType: 'application/json; charset=utf-8',
-        success: window.location.href = '/add-registry'
+        success: window.location.href = '/add-registry?parentId=' + parentId
     });
 }
 
-function moveToAddAccountable(){
+function moveToAddAccountable(parentId){
     $.ajax({
         url: '/add-accountable',
         type: 'GET',
+        data: {
+            parentId: parentId
+        },
         contentType: 'application/json; charset=utf-8',
-        success: window.location.href = '/add-accountable'
+        success: window.location.href = '/add-accountable?parentId=' + parentId
     });
 }
 
@@ -36,6 +42,21 @@ function editRegistry(id){
         contentType: 'application/json; charset=utf-8',
         success: window.location.href = function (response){
             window.location.replace("/add-registry?id=" + response.id);
+        }
+    });
+}
+
+function editAcc(id){
+    $.ajax({
+        url: '/edit-element',
+        type: 'GET',
+        data: {
+            id: id
+        },
+        async: false,
+        contentType: 'application/json; charset=utf-8',
+        success: window.location.href = function (response){
+            window.location.replace("/add-accountable?id=" + response.id);
         }
     });
 }

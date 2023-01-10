@@ -68,14 +68,24 @@ router.get("/", async (req, res) => {
     try {
         if(!selectedRegistry || selectedRegistry == "") {
             console.log("selected registry tree is invalid. fetching tales");
-            selectedRegistryTree = JSON.parse(await request.get(baseUrl + "tales/all"));
+            currentLevel = hierarchyList[0];
+            console.log("current level : " + currentLevel);
+            let registryByType;
+            try {
+                registryByType = await axios.get(baseUrl + "registry/type/" + currentLevel);
+                selectedRegistryTree = registryByType.data;
+            } catch(err) {
+                console.log(err);
+                console.log("YKES");
+            }
+            
         } else {
             selectedRegistry.children = [];
             console.log("selected registry tree is valid, fetching same level");
             selectedRegistryObject = await findRegistryAndLevel(selectedRegistry);
             currentLevel = selectedRegistryObject.currentLevel;
             selectedRegistryObject = selectedRegistryObject.registryJson;
-            selectedRegistryTree = JSON.parse(await request.get(baseUrl + currentLevel.toLowerCase() + "/all"));
+            selectedRegistryTree = JSON.parse(await request.get(baseUrl + "registry/type/" + currentLevel));
             
             accumulatedAccountables = await getAccountablesForRegistryId(selectedRegistryObject.id);
 
@@ -83,34 +93,33 @@ router.get("/", async (req, res) => {
             console.log("fetching children");
             selectedRegistryObject.children = [];
             
-            if(selectedRegistryObject.books != undefined && selectedRegistryObject.books.length > 0) {                
-                childList = selectedRegistryObject.books;
-            } else if(selectedRegistryObject.sections != undefined && selectedRegistryObject.sections.length > 0) {
-                childList = selectedRegistryObject.sections;
-            } else if(selectedRegistryObject.chapter != undefined && selectedRegistryObject.chapter.length > 0) {
-                childList = selectedRegistryObject.chapter;
-            } else if(selectedRegistryObject.paragraphs != undefined && selectedRegistryObject.paragraphs.length > 0) {
-                childList = selectedRegistryObject.paragraphs;
-            } else if(selectedRegistryObject.accountables != undefined && selectedRegistryObject.accountables.length > 0) {                
-                childList = selectedRegistryObject.accountables;             
+            if(selectedRegistryObject.childs != undefined && selectedRegistryObject.childs.length > 0) {                
+                childList = selectedRegistryObject.childs;
+            }
+
+            breadCrumb = await getBreadCrumb(currentLevel, selectedRegistryObject.title, hierarchyList);
+            levelNavAdd = '<ion-icon name="add-circle-outline" class="icon-small-level-nav" onclick="moveToAddRegistry(\'' + selectedRegistry + '\')"></ion-icon>';
+            try {
+                await getNextAndPreviousLinks(selectedRegistryObject.id, selectedRegistryTree);
+                if(navigation.next) {
+                    levelNavNext = '<ion-icon name="arrow-forward-outline" class="icon-small-level-nav" onclick="selectRegistry(\'' + navigation.next + '\')"></ion-icon>'
+                }
+                if(navigation.previous) {
+                    levelNavPrevious = '<ion-icon name="arrow-back-outline" class="icon-small-level-nav" onclick="selectRegistry(\'' + navigation.previous + '\')"></ion-icon>';
+                }
+                if(navigation.top) {
+                    levelNavTop = '<ion-icon name="arrow-up-outline" class="icon-small-level-nav" onclick="selectRegistry(\'' + navigation.top + '\')"></ion-icon>';
+                }
+                levelNav = {levelNavPrevious, levelNavTop, levelNavNext, levelNavHome, levelNavAdd, levelNavVoid, levelNavDump, levelNavRestore};
+            } catch (errNav) {
+                console.log("error fetching navigational links.");
+                console.log(errNav);
             }
             
-            breadCrumb = await getBreadCrumb(currentLevel, selectedRegistryObject.title, hierarchyList);           
-            await getNextAndPreviousLinks(selectedRegistryObject.id);
-            if(navigation.next) {
-                levelNavNext = '<ion-icon name="arrow-forward-outline" class="icon-small-level-nav" onclick="selectRegistry(\'' + navigation.next + '\')"></ion-icon>'
-            }
-            if(navigation.previous) {
-                levelNavPrevious = '<ion-icon name="arrow-back-outline" class="icon-small-level-nav" onclick="selectRegistry(\'' + navigation.previous + '\')"></ion-icon>';
-            }
-            if(navigation.top) {
-                levelNavTop = '<ion-icon name="arrow-up-outline" class="icon-small-level-nav" onclick="selectRegistry(\'' + navigation.top + '\')"></ion-icon>';
-            }
-            levelNav = {levelNavPrevious, levelNavTop, levelNavNext, levelNavHome, levelNavAdd, levelNavVoid, levelNavDump, levelNavRestore};
         }
     } catch (err) {
         //
-    }
+    }    
     for(const arrayElement of childList) {
         try { 
             console.log("child: " + arrayElement);
@@ -127,7 +136,7 @@ router.get("/", async (req, res) => {
 
     console.log("\n\nprerender\n\n");
 
-    const showAddAccountables = currentLevel == "Paragraphs";    
+    const showAddAccountables = true; //TODO XXX REVALIDATE OR REMOVE
 
     console.log("selectedRegistry\n");
     console.log(selectedRegistry);
@@ -137,7 +146,11 @@ router.get("/", async (req, res) => {
     console.log(currentLevel);
     console.log("selectedRegistryObject\n");
     console.log(selectedRegistryObject);
-    console.log("\n\n\\prerender\n\n");
+    console.log("\n\n");
+    console.log("-------------------------------------------------------------------");
+    console.log("\n\prerender\n");
+    console.log("-------------------------------------------------------------------");
+    console.log("\n");
 
     
 
@@ -153,24 +166,35 @@ router.get("/", async (req, res) => {
     });
 })
 
-const getNextAndPreviousLinks = async (registryId) => {
+const getNextAndPreviousLinks = async (registryId, selectedRegistryTree) => {
+    console.log("next and previous");
     navigation = {};
     let previous;
     let first;
     let found = false;
+    let count = 0;
     if(selectedRegistryTree) {
         for(const element of selectedRegistryTree) {
+            console.log("element");
+            console.log(element);
+            console.log("element");
+            console.log(count++);
             if(!first) {
                 first = element;
             }
             if(element.id == registryId) {
-                navigation.previous = previous.id;
+                if(previous) {
+                    navigation.previous = previous.id;
+                }                
                 found = true;
+                console.log("found");
             } else {
                 if(found) {
+                    console.log("setting next");
                     navigation.next = element.id;
                     break;
                 } else {
+                    console.log("else setting prev");
                     previous = element;
                 }
             }
@@ -178,21 +202,24 @@ const getNextAndPreviousLinks = async (registryId) => {
 
     }
     try {
-        let response = await axios.get(baseUrl + "util/find-parent/" + registryId);
+        let response = await axios.get(baseUrl + "registry/find-parent/" + registryId);
         console.log("finding parent for navigation for " + registryId);
         if(response.data) {
             console.log("parent found: " + response.data);
             navigation.top = response.data;
         }
     } catch (err) {
+        console.log("error populating navigation!");
+        console.log(err);
         //Ok, dont populate navigation object
     }
+    return true;
 }
 
 const getAccountablesForRegistryId = async (id) => {    
     console.log(selectedRegistryObject);
     try {
-        accumulatedAccountables = await axios.get(baseUrl + "accountables/accountables-for-entity/" + selectedRegistryObject.id);
+        accumulatedAccountables = await axios.get(baseUrl + "registry/accountables-for-entity/" + selectedRegistryObject.id);
         console.log("Accumulated Accountables from " + selectedRegistryObject.id);
         console.log(accumulatedAccountables.data);
         
@@ -218,51 +245,19 @@ const getBreadCrumb = async (currentLevel, currentTitle, hierarchyList) => {
 
 const findRegistryAndLevel = async (id) => {
     let registry = undefined;
-    let currentLevel = undefined
     console.log("\n\nFind level and registry \n\n"); //this need to die
     try {
-        console.log(baseUrl + "tales/" + id);
-        registry = await request.get(baseUrl + "tales/" + id);
-        console.log("found tale");
-        currentLevel = "Tales";
-    } catch (errTales) {
-        try {
-            console.log(baseUrl + "books/" + id);
-            registry = await request.get(baseUrl + "books/" + id);
-            console.log("found book");
-            currentLevel = "Books";
-        } catch (errBooks) {
-            try {
-                console.log(baseUrl + "sections/" + id);
-                registry = await request.get(baseUrl + "sections/" + id);
-                currentLevel = "Sections";
-            } catch (errSections) {
-                try {
-                    console.log(baseUrl + "chapters/" + id);
-                    registry = await request.get(baseUrl + "chapters/" + id);
-                    currentLevel = "Chapters";
-                } catch (errChapters) {
-                    try {
-                        console.log(baseUrl + "paragraphs/" + id);
-                        registry = await request.get(baseUrl + "paragraphs/" + id);
-                        currentLevel = "Paragraphs";
-                    } catch (errParagraphs) {
-                        try {
-                            console.log(baseUrl + "accountables/" + id);
-                            registry = await request.get(baseUrl + "accountables/" + id);
-                            currentLevel = "Accountables";
-                        } catch (errSections) {
-                            console.log("error finding register");        
-                            console.log(err.message);                                                   
-                        }
-                    }
-                }
-            }
-        }
+        console.log(baseUrl + "registry/" + id);
+        registry = await request.get(baseUrl + "registry/" + id);
+        console.log("found register");
+    } catch (err) {
+        console.log("error finding register");        
+        console.log(err.message);
     }
     console.log("registry recovered!");
     console.log(registry);
     const registryJson = JSON.parse(registry);
+    const currentLevel = registryJson.type;
     return {registryJson, currentLevel};
 
 }
@@ -271,15 +266,15 @@ const findRegistryAndLevel = async (id) => {
 router.get("/add-registry", async (req, res) => {
 
     /** this repeats for now */
-    let hierarchy = "Tale;Book;Chapter;Paragraph";
-    const hierarquyResquest = await axios.get(baseUrl + "util/hierarchy/");    
-    hierarchy = hierarquyResquest;
+    let hierarchy = "Tale;Book;Chapter;Paragraph";    
     try {
-        const hierarquyResquest = await request.get(baseUrl + "util/hierarchy/");
-        hierarchy = hierarquyResquest;
+        const hierarquyResquest = await axios.get(baseUrl + "util/hierarchy/");
+        hierarchy = hierarquyResquest.data;
     } catch (err) {
         console.log("error recovering hierarchy. using defaults")
     }   
+    let parentId = req.param("parentId");
+    console.log("adding child to parent " + parentId);
 
     let hierarchySplit = hierarchy.split(";");
     let hierarchyList = [];
@@ -337,7 +332,8 @@ router.get("/add-registry", async (req, res) => {
         selectedHierarchy,
         registry,
         selectedRegistryTree,
-        currentLevel
+        currentLevel,
+        parentId
     });
 })
 
@@ -359,6 +355,13 @@ router.get("/add-accountable", async (req, res) => {
     }
 
     selectedRegistry = req.param("id");
+    const parentId = req.param("parentId")
+    if(selectedRegistry) {
+        console.log("adding accountable to parent id " + selectedRegistry);
+    } else {
+        console.log("accountable parent id not set");
+    }
+    
     let registry = {};
     let currentLevel = "Tale";
     if(selectedRegistry != undefined && selectedRegistry != "") {
@@ -410,7 +413,9 @@ router.get("/add-accountable", async (req, res) => {
         selectedHierarchy,
         registry,
         selectedRegistryTree,
-        currentLevel
+        currentLevel,
+        selectedRegistry,
+        parentId
     });
 })
 
@@ -425,7 +430,6 @@ router.post("/add-registry-submit", async (req, res) => {
     formJson.orderIndex = requestBody.orderIndex;
     formJson.text = requestBody.text;
     formJson.imgPath = requestBody.imgPath;
-    formJson.time = requestBody.time;
     formJson.type = requestBody.type;
     formJson.owner = "admin";
     formJson.id = requestBody.id;
@@ -434,11 +438,11 @@ router.post("/add-registry-submit", async (req, res) => {
     const urllocal = await getUrlFromType(baseUrl, req.body.type, "add");
     console.log(urllocal);    
     
-    const form = await removeFieldsAccordingToType(formJson, formJson.type);
+    const form = formJson;
     console.log(form);
     console.log(JSON.stringify(form));    
 
-    await request.post({
+    const response = await request.post({
         headers: {
             'content-type' : 'application/json; charset=utf-8'
         },
@@ -446,6 +450,16 @@ router.post("/add-registry-submit", async (req, res) => {
         encoding: 'latin1',
         body: JSON.stringify(form)
     });
+    const formlink = {id : requestBody.parentId, childs : [ JSON.parse(response).id ]};
+    await request.post({
+        headers: {
+            'content-type' : 'application/json; charset=utf-8'
+        },
+        url:baseUrl + "registry/addChild/",
+        encoding: 'latin1',
+        body: JSON.stringify(formlink)
+    });
+
     res.status(200).redirect("/add-registry");
 })
 
@@ -460,19 +474,22 @@ router.post("/add-accountable-submit", async (req, res) => {
     formJson.ionIcon = requestBody.ionIcon;
     formJson.amount = requestBody.amount;
     formJson.visible = true;
-    formJson.type = "Accountable";
-    
     formJson.id = requestBody.id;
+    if(!formJson.id) {
+        formJson.id = "";
+    }
+    
+    //formJson.id = requestBody.id;
     console.log(formJson);
 
     const urllocal = await getUrlFromType(baseUrl, "Accountable", "add");
     console.log(urllocal);    
     
-    const form = await removeFieldsAccordingToType(formJson, formJson.type);
+    const form = formJson;
     console.log(form);
     console.log(JSON.stringify(form));    
 
-    await request.post({
+    let response = await request.post({
         headers: {
             'content-type' : 'application/json; charset=utf-8'
         },
@@ -480,53 +497,32 @@ router.post("/add-accountable-submit", async (req, res) => {
         encoding: 'latin1',
         body: JSON.stringify(form)
     });
+    console.log("POST RESPONSE FROM ADD ACCOUNTABLE");
+    console.log(response);
+    const formLink = {id : requestBody.parentId, accountables : [ JSON.parse(response).id ]}
+    const urllocalLinkParent = baseUrl + "registry/addAccountable/";
+
+    //link to parent
+    const goNowhere = await request.post({
+        headers: {
+            'content-type' : 'application/json; charset=utf-8'
+        },
+        url:urllocalLinkParent,
+        encoding: 'latin1',
+        body: JSON.stringify(formLink)
+    });
+
     res.status(200).redirect("/add-accountable");
 })
 
-const removeFieldsAccordingToType = async (form) => {
-    if(form.type == "Tale") {
-        delete form["time"];
-    }
-    if(form.type == "Accountable") {
-        delete form["owner"];
-    }
-    delete form["type"];
-    return form;
-}
-
 const getUrlFromType = async(urllocal,type, operation) => {    
-    const req = await request.get(baseUrl + "util/hierarchy/");    
-    if(req) {
-        console.log("hierarchy returned: " + req);
-        hierarchy = req;       
-    } else {    
-        console.log("error querying registry order; using default.")
-        hierarchy = "Tales;Books;Chapters;Paragraphs";
-    }
-    let hierarchySplit = hierarchy.split(";");       
     let result = "errorUrlFromTypeAndOperation";
     if(type == "Accountable" || type == "Accountables") {
         console.log("whaaaaaaaaaaaat");
         result = urllocal + "accountables/" +  getOperation(operation);
+    } else {
+        result = urllocal + "registry/" +  getOperation(operation);
     }
-    for(const arrayElement of hierarchySplit) {
-        if(arrayElement == type) {            
-            console.log(type);
-            if(type == "Tale" || type == "Tales") {
-                result = urllocal + "tales/" +  getOperation(operation);
-            } else if(type == "Book" || type == "Books") {
-                result = urllocal + "books/" +  getOperation(operation);
-            } else if(type == "Section" || type == "Sections") {
-                result = urllocal + "sections/" +  getOperation(operation);
-            } else if(type == "Chapter" || type == "Chapters") {
-                result = urllocal + "chapters/" +  getOperation(operation);
-            } else if(type == "Paragraph" || type == "Paragraphs") {
-                result = urllocal + "paragraphs/" +  getOperation(operation);
-            } else if(type == "Accountable" || type == "Accountables") {
-                result = urllocal + "accountables/" +  getOperation(operation);
-            }
-        }
-    };
     return result; 
 }
 
@@ -539,7 +535,7 @@ const getOperation = (operation) => {
     //     return "delete/";
     } else if (operation === "all") {
         return "all";
-    }
+    } //TODO XXX FIX ACCOUNTABLES HERE?
     return "";
 
 }
@@ -561,6 +557,10 @@ router.get("/select-element", async (req, res) => {
 })
 
 router.get("/edit-element", async (req, res) => {
+    res.status(200).send({id: req.param("id")});
+})
+
+router.get("/edit-element-acc", async (req, res) => {
     res.status(200).send({id: req.param("id")});
 })
 
@@ -643,28 +643,8 @@ router.post("/add-child-submit", async (req, res) => {
     }
     let hierarchySplit = hierarchy.split(";");       
     let urllocal = "errorUrlFromTypeAndOperation";
-    hierarchySplit.forEach(arrayElement => {
-        console.log(arrayElement);
-        if(arrayElement == type) {            
-            console.log(type);
-            if(type == "Tale" || type == "Tales") {
-                urllocal = baseUrl + "tales/" +  getOperation(operation);
-                formJson.books = [req.body.child];
-            } else if(type == "Book" || type == "Books") {
-                urllocal = baseUrl + "books/" +  getOperation(operation);
-                formJson.sections = [req.body.child];
-            } else if(type == "Section" || type == "Sections") {
-                urllocal = baseUrl + "sections/" +  getOperation(operation);
-                formJson.chapter = [req.body.child];
-            } else if(type == "Chapter" || type == "Chapters") {
-                urllocal = baseUrl + "chapters/" +  getOperation(operation);
-                formJson.paragraphs = [req.body.child];
-            } else if(type == "Paragraph" || type == "Paragraphs") {
-                urllocal = baseUrl + "paragraphs/" +  getOperation(operation);
-                formJson.accountables = [req.body.child];
-            }
-        }
-    });
+    urllocal = baseUrl + "registry/" +  getOperation(operation);
+    formJson.childs = [req.body.child];
     console.log(formJson);
     console.log(urllocal);
     try {
@@ -700,19 +680,7 @@ router.get("/del-child", async (req, res) => {
 
         //please die again
         console.log("please die again");
-
-        if(type == "Tale" || type == "Tales") {
-            formJson.books = [id];
-        } else if(type == "Book" || type == "Books") {
-            formJson.sections = [id];
-        } else if(type == "Section" || type == "Sections") {
-            formJson.chapter = [id];
-        } else if(type == "Chapter" || type == "Chapters") {            
-            formJson.paragraphs = [id];
-        } else if(type == "Paragraph" || type == "Paragraphs") {
-            formJson.accountables = [id];
-        }
-
+        formJson.childs = [id];
         console.log(urllocal);
         console.log(formJson);
 

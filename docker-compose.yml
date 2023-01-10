@@ -1,0 +1,36 @@
+version: '3'
+services:
+  mongodb:
+    image: 'mongo:4.0.4'
+    container_name: 'mongodb'
+    volumes:
+      - ./mongo/volume_404:/data/db
+    ports:
+      - '27017-27019:27017-27019'
+    networks:
+      - app-connect
+  storyteller:
+    image: 'pedrotfs/storyteller:latest'
+    environment:
+      - PORT=8090
+      - CONNECTION_URL=mongodb://127.0.0.1:27017/storytellerV2
+      - TOKEN_SECRET=secret
+    depends_on:
+      - mongodb
+    ports:
+      -8090:8090
+    networks:
+      - app-connect
+  storybook:
+    image: 'pedrotfs/storybook:latest'
+    environment:
+      - PORT=3001
+    depends_on:
+      - storyteller
+    ports:
+      -3001:3001
+    networks:
+      - app-connect
+networks:
+  app-connect:
+    driver: bridge

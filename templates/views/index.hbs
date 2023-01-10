@@ -57,7 +57,7 @@
                 <div class="section__registry--accountables">
                     {{#if accumulatedAccountables}}
                         {{#each accumulatedAccountables}}
-                            <div class="section__registry--single--accountable"><ion-icon name="{{ionIcon}}" class="icon-small"></ion-icon> <b>{{title}}: {{amount}}</b></div>
+                            <div class="section__registry--single--accountable" onclick="editAcc('{{id}})'"><ion-icon name="{{ionIcon}}" class="icon-small"></ion-icon> <b>{{title}}: {{amount}}</b></div>
                         {{/each}}
                     {{/if}}
                 </div>
@@ -80,7 +80,7 @@
                 <h2>{{currentLevel}}</h2>
                 <ul class="section__registry-sibling-list">
                 {{#each selectedRegistryTree}}
-                    <div onclick="selectRegistry('{{id}}')">
+                    <div onclick="selectRegistry('{{id}}')"> 
                         <li>
                             {{title}}
                         </li>
