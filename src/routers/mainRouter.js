@@ -75,7 +75,6 @@ router.get("/", async (req, res) => {
                 registryByType = await axios.get(baseUrl + "registry/type/" + currentLevel);
                 selectedRegistryTree = registryByType.data;
             } catch(err) {
-                console.log(err);
                 console.log("YKES");
             }
             
@@ -451,15 +450,16 @@ router.post("/add-registry-submit", async (req, res) => {
         body: JSON.stringify(form)
     });
     const formlink = {id : requestBody.parentId, childs : [ JSON.parse(response).id ]};
-    await request.post({
-        headers: {
-            'content-type' : 'application/json; charset=utf-8'
-        },
-        url:baseUrl + "registry/addChild/",
-        encoding: 'latin1',
-        body: JSON.stringify(formlink)
-    });
-
+    if(requestBody.parentId != undefined && requestBody.parentId != "" && requestBody.parentId != "undefined") {
+        await request.post({
+            headers: {
+                'content-type' : 'application/json; charset=utf-8'
+            },
+            url:baseUrl + "registry/addChild/",
+            encoding: 'latin1',
+            body: JSON.stringify(formlink)
+        });
+    }
     res.status(200).redirect("/add-registry");
 })
 

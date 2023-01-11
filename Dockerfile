@@ -7,4 +7,4 @@ RUN npm install
 COPY . .
 
 EXPOSE 3001
-CMD [ "npm", "run-script", "dev"]
+CMD [ "npm", "run-script", "prod"]
